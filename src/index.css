@@ -3,14 +3,26 @@
 	cursor: pointer;
 	position: absolute;
 	right: 10px;
-    margin-top: -3px;
+    top: 9px;
 }
 
 .todo-list-item:hover .btn-container {
 	visibility: visible;
 }
 
-.todo-list-item.checked span {
+.todo-list-item .list-item-grip {
+	position: absolute;
+    top: 16px;
+    left: 15px;
+    color: #7f7f7f;
+}
+
+.todo-list-item .list-item-value {
+	display: block;
+    padding-left: 18px;
+}
+
+.todo-list-item.checked .list-item-value {
 	text-decoration: line-through;
 	color: grey;
 }

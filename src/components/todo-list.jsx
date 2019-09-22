@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
 
 const SortableItem = SortableElement( ( { indexToHandle, app, todo, onDelete, onCheck } ) => {
 	const statusAfterClick = todo.checked ? false : true;
@@ -8,7 +10,8 @@ const SortableItem = SortableElement( ( { indexToHandle, app, todo, onDelete, on
 		
 	return (
 		<div className={ className }>
-			<span>{ todo.value }</span>
+			<FontAwesomeIcon icon={ faGripVertical } className="list-item-grip" />
+			<span className="list-item-value">{ todo.value }</span>
 			<span className="btn-container">
 				<button 
 					className = "btn btn-info btn-sm"
