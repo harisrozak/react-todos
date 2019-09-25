@@ -7,7 +7,7 @@ const SortableItem = SortableElement( ( { indexToHandle, app, todo, onDelete, on
 	const statusAfterClick = todo.checked ? false : true;
 	let className = "alert alert-secondary bg-white todo-list-item";
 	className += todo.checked ? ' checked' : '';
-		
+	
 	return (
 		<div className={ className }>
 			<FontAwesomeIcon icon={ faGripVertical } className="list-item-grip" />
@@ -31,7 +31,7 @@ const SortableList = SortableContainer( ( { app, todos, onDelete, onCheck } ) =>
 		<div className="my-3">
 			{ todos.map( ( todo, index ) => (
 				<SortableItem 
-					key = { todo.id }
+					key = { index }
 					index = { index } // for sorting purpose
 					indexToHandle = { index } // for action delete and others
 					app = { app }

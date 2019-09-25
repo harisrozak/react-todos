@@ -3,22 +3,136 @@ import arrayMove from "array-move";
 import Navbar from "./components/navbar.jsx";
 import Form from "./components/form.jsx";
 import TodoList from "./components/todo-list.jsx";
+import config from "./config";
+import withFirebaseAuth from "react-with-firebase-auth";
+import * as firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/firestore";
 
+// main app class
 class App extends Component {
 	state = {
-		appTitle: "To Do List",
+		appTitle: config.appTitle,
 		alert: false,
+		isLoggedIn: false,
+		firestoreData: false,
 		todos: [],
 	};
 	
-	componentDidMount() {
-		// set the todos
-		const todos = [
-			{ id: 0, value: "You can begin with inserting a new item", checked: false },	
-			{ id: 1, value: "Or just delete this line :)", checked: true },
-		];
+	constructor( props ) {
+		super( props );
 		
-		this.setState( { todos } );
+		// set the main ref
+		const db = firebaseApp.firestore();
+		this.todosRef = db.collection( 'todos' );
+	}
+	
+	componentDidUpdate( prevProps, prevState ) {		
+		// if user has logged in to google
+		if( prevProps.user !== this.props.user && this.props.user !== null ) {
+			const userKey = this.props.user.email;
+			const isLoggedIn = true;
+			let alert = false;
+			
+			// do loading
+			this.setState( { alert: config.loadingMessage } );
+			
+			// get the firestore data
+			this.todosRef.doc( userKey ).get().then( doc => {
+				const data = doc.data();				
+				
+				if( typeof data !== "undefined" ) {
+					const todos = JSON.parse( data.content );
+					const firestoreData = data;
+					this.setState( { todos, alert, isLoggedIn, firestoreData } );	
+				}
+				else {
+					// sync the existing todos if not empty
+					if( this.state.todos.length === 0 ) {
+						alert = config.noDataMessage;	
+					}
+					else {
+						const dataToInsert = JSON.stringify( this.state.todos );
+						const currentDate = this.getCurrentDate();
+						
+						this.pushToFirestore( {
+							createdAt: currentDate,
+							updatedAt: currentDate,
+							content: dataToInsert,
+						} );
+					}
+					
+					this.setState( { alert, isLoggedIn } );						
+				}
+			} )
+			.catch( error => {
+				this.setState( { alert: config.errorFirebaseMessage } );
+			} );		
+		}
+		
+		// if user has logged out from google
+		if( prevProps.user !== this.props.user && this.props.user === null  ) {
+			const todos = config.defaultData;
+			const isLoggedIn = false;
+			const alert = false;
+			
+			this.setState( { todos, isLoggedIn, alert } );
+		}
+		
+		// if state todos has updated while user has logged in
+		if( prevState.todos !== this.state.todos && this.state.isLoggedIn === true ) {
+			const dataToInsert = JSON.stringify( this.state.todos );
+			const currentDate = this.getCurrentDate();
+			let data = false;
+			let prevContent = false;
+			
+			// it has the firestore data or not
+			if( this.state.firestoreData ) {
+				prevContent = this.state.firestoreData.content;
+				data = {
+					createdAt: this.state.firestoreData.createdAt,
+					updatedAt: currentDate,
+					content: dataToInsert,
+				};
+			}
+			else {
+				data = {
+					createdAt: currentDate,
+					updatedAt: currentDate,
+					content: dataToInsert,
+				};
+			}
+			
+			// push to firestore 
+			// only IF the local and the cloud data is different
+			if( data.content !== prevContent ) {
+				this.pushToFirestore( data );
+			}
+		}
+		
+		// do notification if currently has no todos
+		if( prevState.todos !== this.state.todos && this.state.todos.length === 0 ) {
+			this.setState( { alert: config.noDataMessage } );
+		}
+	}
+	
+	pushToFirestore( data ) {
+		this.todosRef.doc( this.props.user.email ).set( data )
+			.then(function() {
+				console.log("Document successfully written!");
+			})
+			.catch(function(error) {
+				console.error("Error writing document: ", error);
+			});
+	}
+	
+	getCurrentDate() {
+		var currentDate = new Date();
+		var date = currentDate.getDate();
+		var month = currentDate.getMonth(); //Be careful! January is 0 not 1
+		var year = currentDate.getFullYear();
+
+		return date + "-" +(month + 1) + "-" + year;
 	}
 	
 	handleInsert( dataToHandle ) {
@@ -36,7 +150,6 @@ class App extends Component {
 	}
 	
 	handleDelete( indexToHandle ) {
-		console.log(indexToHandle);
 		const todos = this.state.todos.filter( ( item, index ) => index !== indexToHandle );
 		this.setState( { todos } );
 	}
@@ -65,6 +178,8 @@ class App extends Component {
 	}
 	
 	render() {
+		const { user, signInWithGoogle, signOut } = this.props;
+		
 		return (
 			<React.Fragment>
 				<Navbar appTitle = { this.state.appTitle } />
@@ -83,10 +198,30 @@ class App extends Component {
 							onSort = { this.handleSort }
 						/>						
 					</div>
+					
+					{
+						user 
+						? <p>Hello, { user.displayName }</p>
+						: <p>Please sign in.</p>
+					}
+					{
+						this.props.user 
+						? <button onClick={ signOut }>Sign out</button>
+						: <button onClick={ signInWithGoogle }>Sign in with Google</button>
+					}
+	  
 				</div>
+				
+				
 			</React.Fragment>	
 		);
 	}
 }
 
-export default App;
+// init the firebase
+const firebaseApp = firebase.initializeApp( config.firebase );
+const firebaseAppAuth = firebaseApp.auth();
+const providers = {	googleProvider: new firebase.auth.GoogleAuthProvider() };
+
+// export with firebase auth
+export default withFirebaseAuth( { providers, firebaseAppAuth } ) ( App );

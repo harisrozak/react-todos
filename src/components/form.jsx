@@ -53,7 +53,7 @@ class Form extends Component {
 					</div>
 				</div>
 				{ this.props.alert && (
-					<div className="alert alert-danger mt-3">{ this.props.alert }</div>						
+					<div className="alert alert-info mt-3">{ this.props.alert }</div>						
 				) }
 			</form>
 		);
