@@ -1,5 +1,5 @@
 const config = {
-	appTitle: "React Todos",
+	appTitle: "React-Firebase Todos",
 	loadingMessage: "Loading data, please wait..",
 	noDataMessage: "You are currently have no todo item, please add a new one :)",
 	errorFirebaseMessage: "An error encountered while fetching the Firebase data, please reload the page :(",

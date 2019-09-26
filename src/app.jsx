@@ -178,11 +178,17 @@ class App extends Component {
 	}
 	
 	render() {
+		const appTitle = this.state.appTitle;
 		const { user, signInWithGoogle, signOut } = this.props;
 		
 		return (
 			<React.Fragment>
-				<Navbar appTitle = { this.state.appTitle } />
+				<Navbar 
+					appTitle = { appTitle } 
+					user = { user } 
+					signInWithGoogle = { signInWithGoogle } 
+					signOut = { signOut } 
+				/>
 				<div className="container my-3">
 					<div className="col-md-8 offset-md-2">
 						<Form 
@@ -197,22 +203,8 @@ class App extends Component {
 							onCheck = { this.handleCheck }	
 							onSort = { this.handleSort }
 						/>						
-					</div>
-					
-					{
-						user 
-						? <p>Hello, { user.displayName }</p>
-						: <p>Please sign in.</p>
-					}
-					{
-						this.props.user 
-						? <button onClick={ signOut }>Sign out</button>
-						: <button onClick={ signInWithGoogle }>Sign in with Google</button>
-					}
-	  
+					</div>	  
 				</div>
-				
-				
 			</React.Fragment>	
 		);
 	}

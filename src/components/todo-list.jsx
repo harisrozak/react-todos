@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { SortableContainer, SortableElement } from "react-sortable-hoc";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
+import { faGripVertical, faTrashAlt, faCheck } from '@fortawesome/free-solid-svg-icons';
 
 const SortableItem = SortableElement( ( { indexToHandle, app, todo, onDelete, onCheck } ) => {
 	const statusAfterClick = todo.checked ? false : true;
@@ -16,11 +16,11 @@ const SortableItem = SortableElement( ( { indexToHandle, app, todo, onDelete, on
 				<button 
 					className = "btn btn-info btn-sm"
 					onClick = { onCheck.bind( app, indexToHandle, statusAfterClick ) }
-				>SEL</button>
+				><FontAwesomeIcon icon={ faCheck } /></button>
 				<button 
 					className = "btn btn-danger btn-sm ml-2"
 					onClick = { onDelete.bind( app, indexToHandle ) }
-				>DEL</button>
+				><FontAwesomeIcon icon={ faTrashAlt } /></button>
 			</span>
 		</div>
 	)
