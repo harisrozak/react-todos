@@ -8,7 +8,7 @@
     "@fortawesome/react-fontawesome": "^0.1.4",
     "array-move": "^2.1.0",
     "bootstrap": "^4.3.1",
-    "firebase": "^6.6.2",
+    "firebase": "^10.9.0",
     "jquery": "^3.4.1",
     "popper.js": "^1.14.7",
     "react": "^16.9.0",
